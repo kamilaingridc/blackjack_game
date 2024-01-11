@@ -95,7 +95,7 @@ class Game:
             self.dados_jogadores()
 
     def menu(self):
-        print("Bem-vindo ao nosso Blackjack Game!!")
+        print("Bem-vindo ao Blackjack Game!!")
         print("Escolha uma das opções:\n"
               "[1] Jogar | [2] Regras | [3] Sair")
         opcao = int(input("Digite a opção desejada:\n"))
