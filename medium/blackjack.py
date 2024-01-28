@@ -24,6 +24,26 @@ class Jogo:
         if opcao == 1:
             print("Todos começam com 200 fichas.")
             self.dados()
+        elif opcao == 2:
+            self.regras()
+        elif opcao == 3:
+            print("Saindo do jogo...")
+            exit()
+        else:
+            print("Opção inválida. Tente novamente.")
+            self.menu()
+
+    def regras(self):
+        print("REGRAS DO BLACKJACK!\n"
+              "O objetivo é obter uma mão com um valor total mais próximo de 21 do que o oponente, "
+              "sem ultrapassar 21.\n"
+              "\nCartas e Valores:\n"
+              "As cartas têm o valor correspondente ao número nelas representado.\n"
+              "\nJogabilidade:\n"
+              "Os jogadores podem pedir cartas adicionais para se aproximar de 21 ou manter as "
+              "cartas atuais. Se o total das cartas do jogador ultrapassar 21, ele perde automaticamente.\n")
+        time.sleep(1)
+        self.menu()
 
     def dados(self):
         try:
