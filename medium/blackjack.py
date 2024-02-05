@@ -1,15 +1,6 @@
 import random
 import time
-
-
-class Jogadores:
-    def __init__(self, nome, idade, fichas):
-        self.__nome = nome
-        self.__idade = idade
-        self.__fichas = fichas
-
-    def get_fichas(self):
-        return self.__fichas
+from jogadores import Jogadores
 
 
 class Jogo:
@@ -22,7 +13,6 @@ class Jogo:
               "[1] Jogar | [2] Regras | [3] Sair")
         opcao = int(input("Escolha uma opção: "))
         if opcao == 1:
-            print("Todos começam com 200 fichas.")
             self.dados()
         elif opcao == 2:
             self.regras()
@@ -52,6 +42,7 @@ class Jogo:
                 for i in range(jogadores_jogando):
                     nome = str(input(f"Jogador(a) {i + 1}, qual seu nome? "))
                     idade = int(input(f"Jogador(a) {nome}, qual sua idade? "))
+                    print(40 * "-")
                     if idade < 18:
                         print("Você deve ter pelo menos 18 anos para jogar.")
                         exit()
@@ -67,64 +58,84 @@ class Jogo:
         self.iniciar_jogo()
 
     def distribuir_cartas(self):
-        cartas_distribuidas = []
-
         for jogador in self.__lista_jogadores:
-            carta = random.shuffle(self.__baralho)
-            jogador_cartas = [carta]
-            cartas_distribuidas.append((jogador, jogador_cartas))
-            print(f"{jogador._Jogadores__nome} recebeu a carta {carta}")
-
-        return cartas_distribuidas
-
-    def exibir_cartas(self):
-        cartas_distribuidas = self.distribuir_cartas()
-
-        for jogador, cartas in cartas_distribuidas:
-            print(f"{jogador._Jogadores__nome} tem as cartas: {cartas}.")
+            random.shuffle(self.__baralho)
+            carta = self.__baralho.pop()
+            jogador.receber_carta(carta)
+            print(f"{jogador.nome} recebeu a carta {carta}.")
+        print(40 * '-')
 
     def exibir_fichas(self):
         for jogador in self.__lista_jogadores:
-            print(f"{jogador._Jogadores__nome} tem {jogador.get_fichas()} fichas.")
+            print(f"{jogador.nome} tem {jogador.fichas} fichas.")
 
     def aposta(self):
+        apostando = {}  # Dicionário para armazenar as apostas dos jogadores
+        print("Ambos começam com 200 fichas.")
         for i, jogador in enumerate(self.__lista_jogadores):
-            if jogador.get_fichas() > 0:
-                apostando = int(input(f"{jogador._Jogadores__nome}, quanto você vai querer apostar? "))
-                if 0 < apostando <= jogador.get_fichas():
-                    pass
+            if jogador.fichas > 0:
+                apostando[jogador] = int(input(f"{jogador.nome}, quanto você vai querer apostar? "))
+                if 0 < apostando[jogador] <= jogador.fichas:
+                    jogador.adicionar_fichas(-apostando[jogador])
                 else:
                     print("Saldo insuficiente.")
                     self.aposta()
             else:
-                print(f"{jogador._Jogadores__nome}, você não tem fichas suficientes.")
+                print(f"{jogador.nome}, você não tem fichas suficientes.")
+        print(40 * "-")
+        return apostando
 
-    def vencedor(self):
-        pass
-
-    def pontuacao(self):
-        pass
-
-    def pegar_cartas(self, jogador):
-        print(f"{jogador._Jogadores__nome} escolheu pegar cartas.")
-
-    def nao_pegar_cartas(self, jogador):
-        print(f"{jogador._Jogadores__nome} escolheu não pegar cartas.")
+    def vencedor(self, jogadores, apostando):
+        for jogador in jogadores:
+            total_pontos = sum(jogador.mostrar_cartas())
+            if total_pontos > 21:
+                print(f'{jogador.nome} perdeu.')
+                for vencedor, aposta in apostando.items():
+                    if vencedor != jogador:
+                        vencedor.adicionar_fichas(aposta)
+                        jogador.adicionar_fichas(-aposta)
+                        print(
+                            f"{vencedor.nome} ganhou {aposta} fichas. Seu saldo atual é {vencedor.fichas + aposta}.")
+            elif total_pontos == 21:
+                print(f'{jogador.nome} venceu!! Parabéns.')
+                jogador.adicionar_fichas(apostando[jogador])
+                print(
+                    f"{jogador.nome} ganhou {apostando[jogador]} fichas. Seu saldo atual é {jogador.fichas + aposta}.")
 
     def iniciar_jogo(self):
         print("Vamos começar!!")
+        print(40 * "-")
         time.sleep(1)
-        self.aposta()
         self.distribuir_cartas()
-        self.exibir_cartas()
+        apostando = self.aposta()
 
-        for i, jogador in enumerate(self.__lista_jogadores):
-            escolha = int(input(f"{jogador._Jogadores__nome}, escolha:\n"
+        num_jogadores = len(self.__lista_jogadores)
+        index_jogador = 0
+
+        while True:
+            jogador = self.__lista_jogadores[index_jogador]
+            escolha = int(input(f"{jogador.nome}, escolha:\n"
                                 "[1] Pegar cartas | [2] Não pegar cartas "))
+
             if escolha == 1:
-                self.pegar_cartas(jogador)
+                carta = self.__baralho.pop()
+                jogador.receber_carta(carta)
+                print(f'{jogador.nome}, suas cartas atuais: {jogador.mostrar_cartas()}\n')
+
+                total_pontos = sum(jogador.mostrar_cartas())
+                if total_pontos > 21:
+                    print(f'{jogador.nome}, você ultrapassou 21.\n')
+                    self.vencedor(self.__lista_jogadores, apostando)
+                    break
             elif escolha == 2:
-                self.nao_pegar_cartas(jogador)
+                print(f'{jogador.nome}, suas cartas atuais: {jogador.mostrar_cartas()}.\n'
+                      f'Fim do jogo!')
+                self.vencedor(self.__lista_jogadores, apostando)
+                break
+            else:
+                print("Opção inválida. Tente novamente.")
+
+            index_jogador = (index_jogador + 1) % num_jogadores
 
 
 jogo = Jogo()
