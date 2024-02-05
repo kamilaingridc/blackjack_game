@@ -38,16 +38,16 @@ class Jogo:
     def dados(self):
         try:
             jogadores_jogando = int(input("Quantos jogadores vão jogar? "))
-            if jogadores_jogando >= 2:
+            if jogadores_jogando >= 2:  # verificação de mínimo de jogadores
                 for i in range(jogadores_jogando):
                     nome = str(input(f"Jogador(a) {i + 1}, qual seu nome? "))
                     idade = int(input(f"Jogador(a) {nome}, qual sua idade? "))
                     print(40 * "-")
-                    if idade < 18:
+                    if idade < 18:  # verificação de idade
                         print("Você deve ter pelo menos 18 anos para jogar.")
                         exit()
-                    jogador = Jogadores(nome, idade, 200)
-                    self.__lista_jogadores.append(jogador)
+                    jogador = Jogadores(nome, idade, 200)  # cria um jogador na classe Jogadores
+                    self.__lista_jogadores.append(jogador)  # adiciona o jogador na lista
             else:
                 print("Número mínimo de jogadores: 2\n"
                       "Digite novamente!")
@@ -58,7 +58,7 @@ class Jogo:
         self.iniciar_jogo()
 
     def distribuir_cartas(self):
-        for jogador in self.__lista_jogadores:
+        for jogador in self.__lista_jogadores:  # método de distribuição de cartas
             random.shuffle(self.__baralho)
             carta = self.__baralho.pop()
             jogador.receber_carta(carta)
@@ -70,12 +70,12 @@ class Jogo:
             print(f"{jogador.nome} tem {jogador.fichas} fichas.")
 
     def aposta(self):
-        apostando = {}  # Dicionário para armazenar as apostas dos jogadores
+        apostando = {}  # dicionário para armazenar as apostas
         print("Ambos começam com 200 fichas.")
         for i, jogador in enumerate(self.__lista_jogadores):
-            if jogador.fichas > 0:
+            if jogador.fichas > 0:  # só aposta se tiver mais de 0 fichas
                 apostando[jogador] = int(input(f"{jogador.nome}, quanto você vai querer apostar? "))
-                if 0 < apostando[jogador] <= jogador.fichas:
+                if 0 < apostando[jogador] <= jogador.fichas:  # verifica se a quantidade está de acordo
                     jogador.adicionar_fichas(-apostando[jogador])
                 else:
                     print("Saldo insuficiente.")
@@ -87,11 +87,11 @@ class Jogo:
 
     def vencedor(self, jogadores, apostando):
         for jogador in jogadores:
-            total_pontos = sum(jogador.mostrar_cartas())
+            total_pontos = sum(jogador.mostrar_cartas())  # soma das cartas
             if total_pontos > 21:
                 print(f'{jogador.nome} perdeu.')
                 for vencedor, aposta in apostando.items():
-                    if vencedor != jogador:
+                    if vencedor != jogador:  # verifica quem é o vencedor
                         vencedor.adicionar_fichas(aposta)
                         jogador.adicionar_fichas(-aposta)
                         print(
@@ -110,15 +110,15 @@ class Jogo:
         apostando = self.aposta()
 
         num_jogadores = len(self.__lista_jogadores)
-        index_jogador = 0
+        i_jogador = 0  # para intercalar nas escolhas
 
         while True:
-            jogador = self.__lista_jogadores[index_jogador]
+            jogador = self.__lista_jogadores[i_jogador]
             escolha = int(input(f"{jogador.nome}, escolha:\n"
                                 "[1] Pegar cartas | [2] Não pegar cartas "))
 
             if escolha == 1:
-                carta = self.__baralho.pop()
+                carta = self.__baralho.pop()  # remove elemento da lista
                 jogador.receber_carta(carta)
                 print(f'{jogador.nome}, suas cartas atuais: {jogador.mostrar_cartas()}\n')
 
@@ -135,7 +135,7 @@ class Jogo:
             else:
                 print("Opção inválida. Tente novamente.")
 
-            index_jogador = (index_jogador + 1) % num_jogadores
+            i_jogador = (i_jogador + 1) % num_jogadores
 
 
 jogo = Jogo()
